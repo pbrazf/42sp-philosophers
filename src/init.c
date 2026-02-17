@@ -15,6 +15,7 @@
 static int cleanup_on_error(t_table *table, char *msg)
 {
 	int i;
+
 	i = 0;
 	if (table->forks)
 	{
