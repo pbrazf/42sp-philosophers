@@ -1,0 +1,9 @@
+/docs
+*.o
+*.a
+philo
+philo_bonus
+
+# Agent Config
+.agent/
+.gemini/
