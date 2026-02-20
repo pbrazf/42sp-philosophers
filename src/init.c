@@ -29,6 +29,26 @@ static int cleanup_on_error(t_table *table, char *msg)
 	return (0);
 }
 
+int	init_philos(t_table *table)
+{
+	int	i;
+
+	i = 0;
+	while (i < table->rules.num_philosophers)
+	{
+		table->philos[i].id = i + 1;
+		table->philos[i].meals_eaten = 0;
+		table->philos[i].last_meal = 0;
+		table->philos[i].left_fork_idx = i;
+		table->philos[i].right_fork_idx = (i + 1) % table->rules.num_philosophers;
+		table->philos[i].table = table;
+		if (pthread_mutex_init(&table->philos[i].meal_lock, NULL) != 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	init_table(t_table *table)
 {
 	int	i;
@@ -52,20 +72,7 @@ int	init_table(t_table *table)
 	if (pthread_mutex_init(&table->state_mutex, NULL) != 0)
 		return (cleanup_on_error(table, "Error init state mutex\n"));
 	// 2. Iniciar Filósofos
-	i = 0;
-	while (i < table->rules.num_philosophers)
-	{
-		table->philos[i].id = i;
-		table->philos[i].meals_eaten = 0;
-		table->philos[i].last_meal = 0;
-		table->philos[i].left_fork_idx = i;
-		table->philos[i].right_fork_idx = (i + 1) % table->rules.num_philosophers;
-		table->philos[i].table = table;
-		if (pthread_mutex_init(&table->philos[i].meal_lock, NULL) != 0)
-			return (cleanup_on_error(table, "Error init mutex meal_lock for one of the philosophers\n"));
-		i++;
-	}
-	table->stop = false;
-	table->finished_count = 0;
+	if (!init_philos(table))
+		return (cleanup_on_error(table, "Error init mutex meal_lock for one of the philosophers\n"));
 	return (1);
 }

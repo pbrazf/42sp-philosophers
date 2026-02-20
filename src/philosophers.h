@@ -13,14 +13,14 @@
 #ifndef PHILOSOPHERS_H
 #define PHILOSOPHERS_H
 
-typedef struct s_rules {
-	int num_philosophers;
-	int time_to_die;
-	int time_to_eat;
-	int time_to_sleep;
-	int num_times_each_philosopher_must_eat;
-} t_rules;
+#include <stdbool.h>
+#include <limits.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <sys/time.h>
 
+typedef struct s_table t_table;
 typedef struct s_philo {
 	pthread_t       thread_id;      // Para dar join depois
 	int             id;
@@ -32,6 +32,14 @@ typedef struct s_philo {
 	t_table         *table;         // Ponteiro para acessar as regras/garfos
 } t_philo;
 
+typedef struct s_rules {
+	int num_philosophers;
+	int time_to_die;
+	int time_to_eat;
+	int time_to_sleep;
+	int num_times_each_philosopher_must_eat;
+} t_rules;
+
 typedef struct s_table {
 	t_rules rules;
 	long start_ms;
@@ -42,12 +50,6 @@ typedef struct s_table {
 	pthread_mutex_t print_mutex;
 	pthread_mutex_t state_mutex;
 } t_table;
-
-#include <stdbool.h>
-#include <limits.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <pthread.h>
 
 // parsing.c
 int 	validate_args(int argc, char *argv[], t_rules *rules);
