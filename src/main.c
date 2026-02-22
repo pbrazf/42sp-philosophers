@@ -6,7 +6,7 @@
 /*   By: pedrferr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 17:54:31 by pedrferr          #+#    #+#             */
-/*   Updated: 2026/02/19 21:50:56 by pedrferr         ###   ########.fr       */
+/*   Updated: 2026/02/22 01:15:10 by pedrferr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@ int	main(int argc, char *argv[])
 
 	if (!validate_args(argc, argv, &rules))
 	{
-		write(1, "Error args!\n", 12);
+		printf("Error args!\n");
 		return (0);
 	}
 	table.rules = rules;
 	if (!init_table(&table))
 	{
-		write(1, "Error init!\n", 12);
+		printf("Error init!\n");
 		return (0);
 	}
-	write(1, "Success init!\n", 14);
+	printf("Success init!\n");
 	// cleanup_table(&table); // TODO: Implement proper cleanup later
 	return (1);
 }

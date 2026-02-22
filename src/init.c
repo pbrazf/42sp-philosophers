@@ -25,7 +25,7 @@ static int cleanup_on_error(t_table *table, char *msg)
 	}
 	if (table->philos)
 		free(table->philos);
-	ft_print(msg);
+	printf("%s", msg);
 	return (0);
 }
 

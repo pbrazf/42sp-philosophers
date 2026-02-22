@@ -16,6 +16,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
@@ -54,10 +55,18 @@ typedef struct s_table {
 // parsing.c
 int 	validate_args(int argc, char *argv[], t_rules *rules);
 
-// utils.c
-void	ft_print(char *str);
+// time.c
+long	get_time_in_ms(void);
+void	smart_sleep(long time_in_ms, t_table *table);
 
 // init.c
 int		init_table(t_table *table);
+
+// print.c
+void	print_status(t_philo *philo, char *status);
+
+// routine.c 
+bool	check_stop(t_table *table);
+void	*routine(void *arg);
 
 #endif

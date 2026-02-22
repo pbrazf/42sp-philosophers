@@ -12,18 +12,6 @@
 
 #include "philosophers.h"
 
-void	ft_print(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		write(1, &str[i], 1);
-		i++;
-	}
-}
-
 long	get_time_in_ms(void)
 {
 	struct timeval	tv;
@@ -39,8 +27,8 @@ void	smart_sleep(long time_in_ms, t_table *table)
 	start_time = get_time_in_ms();
 	while ((get_time_in_ms() - start_time) < time_in_ms)
 	{
-		// if (check_stop(table)) // Ainda nao temos check_stop, entao...
-		//		break ;
+		if (check_stop(table))
+				break ;
 		usleep(100); // 0.1ms de folga pra CPU respirar
 	}
 }
