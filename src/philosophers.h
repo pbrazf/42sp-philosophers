@@ -69,4 +69,7 @@ void	print_status(t_philo *philo, char *status);
 bool	check_stop(t_table *table);
 void	*routine(void *arg);
 
+// monitor.c
+void	*monitor(void *arg);
+
 #endif
