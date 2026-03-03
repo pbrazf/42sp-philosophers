@@ -18,6 +18,7 @@ void	*monitor(void *arg)
 	t_philo		*philos;
 	int			i;
 	int			num_philosophers;
+	int			finished;
 	long		passed_time;
 
 	table = (t_table *)arg;
@@ -25,11 +26,14 @@ void	*monitor(void *arg)
 	num_philosophers = table->rules.num_philosophers;
 	while (1 == 1)
 	{
+		finished = 1;
 		i = 0;
 		while (i < num_philosophers)
 		{
 			pthread_mutex_lock(&philos[i].meal_lock);
 			passed_time = get_time_in_ms() - philos[i].last_meal;
+			if (philos[i].meals_eaten < table->rules.num_times_each_philosopher_must_eat)
+				finished = 0;
 			pthread_mutex_unlock(&philos[i].meal_lock);
 			if (passed_time >= table->rules.time_to_die)
 			{
@@ -40,8 +44,14 @@ void	*monitor(void *arg)
 				return (NULL);
 			}
 			i++;
-			usleep(100);
 		}
-
+		if (table->rules.num_times_each_philosopher_must_eat != -1 && finished)
+		{
+			pthread_mutex_lock(&table->state_mutex);
+			table->stop = true;
+			pthread_mutex_unlock(&table->state_mutex);
+			return (NULL);
+		}
+		usleep(100);
 	}
 }

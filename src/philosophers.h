@@ -61,6 +61,7 @@ void	smart_sleep(long time_in_ms, t_table *table);
 
 // init.c
 int		init_table(t_table *table);
+void	cleanup_table(t_table *table);
 
 // print.c
 void	print_status(t_philo *philo, char *status);

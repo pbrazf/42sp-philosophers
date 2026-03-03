@@ -61,6 +61,12 @@ void *routine(void *arg)
 			pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
 			print_status(philo, "has taken a fork");
 		}
+		// if (check_stop(philo->table))
+		// {
+		// 	pthread_mutex_unlock(&philo->table->forks[philo->left_fork_idx]);
+		// 	pthread_mutex_unlock(&philo->table->forks[philo->right_fork_idx]);
+		// 	return (NULL);
+		// }
 
 		// 2. comer
 		pthread_mutex_lock(&philo->meal_lock);
@@ -76,10 +82,14 @@ void *routine(void *arg)
 		pthread_mutex_unlock(&philo->table->forks[philo->right_fork_idx]);
 
 		// 4. dormir
+		// if (check_stop(philo->table))
+		// 	return (NULL);
 		print_status(philo, "is sleeping");
 		smart_sleep(rules->time_to_sleep, philo->table);
 
 		// 5. pensar 
+		// if (check_stop(philo->table))
+		// 	return (NULL);
 		print_status(philo, "is thinking");
 	}
 	return (NULL);

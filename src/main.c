@@ -6,7 +6,7 @@
 /*   By: pedrferr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 17:54:31 by pedrferr          #+#    #+#             */
-/*   Updated: 2026/02/25 23:15:31 by pedrferr         ###   ########.fr       */
+/*   Updated: 2026/03/02 21:19:08 by pedrferr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ int	main(int argc, char *argv[])
 		printf("Error init!\n");
 		return (0);
 	}
-	printf("Success init!\n");
 	table.start_ms = get_time_in_ms();
 	
 	// 1. create todas as threads
@@ -61,6 +60,7 @@ int	main(int argc, char *argv[])
 	// 2.2 join thread do monitor
 	pthread_join(monitor_thread, NULL);
 	
-	// cleanup_table(&table); // TODO: Implement proper cleanup later
-	return (1);
+	// 3. cleanup
+	cleanup_table(&table);
+	return (0);
 }

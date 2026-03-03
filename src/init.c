@@ -12,6 +12,22 @@
 
 #include "philosophers.h"
 
+void	cleanup_table(t_table *table)
+{
+	int i;
+
+	i = 0;
+	while (i < table->rules.num_philosophers)
+		pthread_mutex_destroy(&table->forks[i++]);
+	free(table->forks);
+	i = 0;
+	while (i < table->rules.num_philosophers)
+		pthread_mutex_destroy(&table->philos[i++].meal_lock);
+	free(table->philos);
+	pthread_mutex_destroy(&table->print_mutex);
+	pthread_mutex_destroy(&table->state_mutex);
+}
+
 static int cleanup_on_error(t_table *table, char *msg)
 {
 	int i;
