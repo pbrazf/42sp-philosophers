@@ -6,19 +6,50 @@
 /*   By: pedrferr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/17 17:54:31 by pedrferr          #+#    #+#             */
-/*   Updated: 2026/03/02 21:19:08 by pedrferr         ###   ########.fr       */
+/*   Updated: 2026/03/08 19:12:33 by pedrferr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
+static void	create_threads(t_table *table, pthread_t *monitor_thread)
+{
+	t_rules	rules;
+	int		i;
+
+	rules = table->rules;
+	i = 0;
+	while (i < rules.num_philosophers)
+	{
+		pthread_mutex_lock(&table->philos[i].meal_lock);
+		table->philos[i].last_meal = table->start_ms;
+		pthread_mutex_unlock(&table->philos[i].meal_lock);
+		pthread_create(&table->philos[i].thread_id, NULL,
+			routine, &table->philos[i]);
+		i++;
+	}
+	pthread_create(monitor_thread, NULL, monitor, table);
+}
+
+static void	join_threads(t_table *table, pthread_t *monitor_thread)
+{
+	int	i;
+
+	i = 0;
+	while (i < table->rules.num_philosophers)
+	{
+		pthread_join(table->philos[i].thread_id, NULL);
+		i++;
+	}
+	pthread_join(*monitor_thread, NULL);
+}
+
 int	main(int argc, char *argv[])
 {
 	t_rules		rules;
-	t_table 	table;
+	t_table		table;
 	pthread_t	monitor_thread;
-	int			i;
-	
+
 	if (!validate_args(argc, argv, &rules))
 	{
 		printf("Error args!\n");
@@ -30,37 +61,11 @@ int	main(int argc, char *argv[])
 		printf("Error init!\n");
 		return (0);
 	}
+	table.stop = false;
+	table.finished_count = 0;
 	table.start_ms = get_time_in_ms();
-	
-	// 1. create todas as threads
-	i = 0;
-	while (i < rules.num_philosophers)
-	{
-		// 1.1 set da última refeição para o início do processo
-		pthread_mutex_lock(&table.philos[i].meal_lock);
-		table.philos[i].last_meal = table.start_ms;
-		pthread_mutex_unlock(&table.philos[i].meal_lock);
-		
-		// 1.2 inicia a thread do philo
-		pthread_create(&table.philos[i].thread_id, NULL, routine, &table.philos[i]);
-		i++;
-	}
-	
-	// 1.3 inicia a thread do monitor
-	pthread_create(&monitor_thread, NULL, monitor, &table);
-	
-	// 2. join nas threads
-	i = 0;
-	while (i < rules.num_philosophers)
-	{
-		// 2.1 join cada thread de philos
-		pthread_join(table.philos[i].thread_id, NULL);
-		i++;
-	}
-	// 2.2 join thread do monitor
-	pthread_join(monitor_thread, NULL);
-	
-	// 3. cleanup
+	create_threads(&table, &monitor_thread);
+	join_threads(&table, &monitor_thread);
 	cleanup_table(&table);
 	return (0);
 }

@@ -29,6 +29,6 @@ void	smart_sleep(long time_in_ms, t_table *table)
 	{
 		if (check_stop(table))
 			break ;
-		usleep(100); // 0.1ms de folga pra CPU respirar
+		usleep(100);
 	}
 }

@@ -24,73 +24,70 @@ bool	check_stop(t_table *table)
 	return (is_stopped);
 }
 
-void *routine(void *arg)
+static void	take_forks(t_philo *philo)
+{
+	if (philo->left_fork_idx < philo->right_fork_idx)
+	{
+		pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
+		print_status(philo, "has taken a fork");
+		pthread_mutex_lock(&philo->table->forks[philo->right_fork_idx]);
+		print_status(philo, "has taken a fork");
+	}
+	else
+	{
+		pthread_mutex_lock(&philo->table->forks[philo->right_fork_idx]);
+		print_status(philo, "has taken a fork");
+		pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
+		print_status(philo, "has taken a fork");
+	}
+}
+
+static void	eat(t_philo *philo, t_rules *rules)
+{
+	long	time_now;
+
+	pthread_mutex_lock(&philo->meal_lock);
+	time_now = get_time_in_ms();
+	philo->last_meal = time_now;
+	philo->meals_eaten += 1;
+	pthread_mutex_unlock(&philo->meal_lock);
+	print_status(philo, "is eating");
+	smart_sleep(rules->time_to_eat, philo->table);
+}
+
+static void	alone_philo_case(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
+	print_status(philo, "has taken a fork");
+	smart_sleep(philo->table->rules.time_to_die, philo->table);
+	pthread_mutex_unlock(&philo->table->forks[philo->left_fork_idx]);
+}
+
+void	*routine(void *arg)
 {
 	t_philo	*philo;
 	t_rules	*rules;
-	long	time_now;
 
 	philo = (t_philo *)arg;
 	rules = &philo->table->rules;
+	if (philo->id % 2 == 0)
+		usleep(rules->time_to_eat * 500);
 	while (!check_stop(philo->table))
 	{
-		// 1. pegar garfos
-
-		// 1.1. Caso especial: Um filósofo solitário
 		if (rules->num_philosophers == 1)
 		{
-			pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
-			print_status(philo, "has taken a fork");
-			smart_sleep(rules->time_to_die, philo->table);
-			pthread_mutex_unlock(&philo->table->forks[philo->left_fork_idx]);
+			alone_philo_case(philo);
 			return (NULL);
 		}
-
-		// 1.2
-		if (philo->left_fork_idx < philo->right_fork_idx)
-		{
-			pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
-			print_status(philo, "has taken a fork");
-			pthread_mutex_lock(&philo->table->forks[philo->right_fork_idx]);
-			print_status(philo, "has taken a fork");
-		}
-		else
-		{
-			pthread_mutex_lock(&philo->table->forks[philo->right_fork_idx]);
-			print_status(philo, "has taken a fork");
-			pthread_mutex_lock(&philo->table->forks[philo->left_fork_idx]);
-			print_status(philo, "has taken a fork");
-		}
-		// if (check_stop(philo->table))
-		// {
-		// 	pthread_mutex_unlock(&philo->table->forks[philo->left_fork_idx]);
-		// 	pthread_mutex_unlock(&philo->table->forks[philo->right_fork_idx]);
-		// 	return (NULL);
-		// }
-
-		// 2. comer
-		pthread_mutex_lock(&philo->meal_lock);
-		time_now = get_time_in_ms();
-		philo->last_meal = time_now;
-		philo->meals_eaten += 1;
-		pthread_mutex_unlock(&philo->meal_lock);
-		print_status(philo, "is eating");
-		smart_sleep(rules->time_to_eat, philo->table);
-
-		// 3. soltar garfos
+		take_forks(philo);
+		eat(philo, rules);
 		pthread_mutex_unlock(&philo->table->forks[philo->left_fork_idx]);
 		pthread_mutex_unlock(&philo->table->forks[philo->right_fork_idx]);
-
-		// 4. dormir
-		// if (check_stop(philo->table))
-		// 	return (NULL);
 		print_status(philo, "is sleeping");
 		smart_sleep(rules->time_to_sleep, philo->table);
-
-		// 5. pensar 
-		// if (check_stop(philo->table))
-		// 	return (NULL);
 		print_status(philo, "is thinking");
+		if (rules->num_philosophers % 2 != 0)
+			usleep(500);
 	}
 	return (NULL);
 }

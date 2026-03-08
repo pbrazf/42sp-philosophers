@@ -12,7 +12,7 @@
 
 #include "philosophers.h"
 
-static int check_argc(int argc)
+static int	check_argc(int argc)
 {
 	if (argc >= 5 && argc <= 6)
 		return (1);
@@ -43,11 +43,11 @@ static bool	parse_int_pos(const char *s, int *out)
 	return (true);
 }
 
-int validate_args(int argc, char *argv[], t_rules *rules)
+int	validate_args(int argc, char *argv[], t_rules *rules)
 {
 	int	i;
-	int value;
-	
+	int	value;
+
 	if (!rules || !check_argc(argc))
 		return (0);
 	i = 1;

@@ -14,7 +14,7 @@
 
 void	cleanup_table(t_table *table)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < table->rules.num_philosophers)
@@ -28,9 +28,9 @@ void	cleanup_table(t_table *table)
 	pthread_mutex_destroy(&table->state_mutex);
 }
 
-static int cleanup_on_error(t_table *table, char *msg)
+static int	cleanup_on_error(t_table *table, char *msg)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (table->forks)
@@ -45,18 +45,20 @@ static int cleanup_on_error(t_table *table, char *msg)
 	return (0);
 }
 
-int	init_philos(t_table *table)
+static int	init_philos(t_table *table)
 {
 	int	i;
+	int	num_philosophers;
 
 	i = 0;
-	while (i < table->rules.num_philosophers)
+	num_philosophers = table->rules.num_philosophers;
+	while (i < num_philosophers)
 	{
 		table->philos[i].id = i + 1;
 		table->philos[i].meals_eaten = 0;
 		table->philos[i].last_meal = 0;
 		table->philos[i].left_fork_idx = i;
-		table->philos[i].right_fork_idx = (i + 1) % table->rules.num_philosophers;
+		table->philos[i].right_fork_idx = (i + 1) % num_philosophers;
 		table->philos[i].table = table;
 		if (pthread_mutex_init(&table->philos[i].meal_lock, NULL) != 0)
 			return (0);
@@ -68,16 +70,17 @@ int	init_philos(t_table *table)
 int	init_table(t_table *table)
 {
 	int	i;
+	int	num_philosophers;
 
-	table->forks = malloc(sizeof(pthread_mutex_t) * table->rules.num_philosophers);
+	num_philosophers = table->rules.num_philosophers;
+	table->forks = malloc(sizeof(pthread_mutex_t) * num_philosophers);
 	if (!table->forks)
 		return (cleanup_on_error(table, "Error on malloc: table->forks"));
-	table->philos = malloc(sizeof(t_philo) * table->rules.num_philosophers);
+	table->philos = malloc(sizeof(t_philo) * num_philosophers);
 	if (!table->philos)
 		return (cleanup_on_error(table, "Error on malloc: table->philos"));
-	// 1. Iniciar Mutexes dos Garfos e Globais
 	i = 0;
-	while (i < table->rules.num_philosophers)
+	while (i < num_philosophers)
 	{
 		if (pthread_mutex_init(&table->forks[i], NULL) != 0)
 			return (cleanup_on_error(table, "Error init mutex fork\n"));
@@ -87,8 +90,8 @@ int	init_table(t_table *table)
 		return (cleanup_on_error(table, "Error init print mutex\n"));
 	if (pthread_mutex_init(&table->state_mutex, NULL) != 0)
 		return (cleanup_on_error(table, "Error init state mutex\n"));
-	// 2. Iniciar Filósofos
 	if (!init_philos(table))
-		return (cleanup_on_error(table, "Error init mutex meal_lock for one of the philosophers\n"));
+		return (cleanup_on_error(table,
+				"Error init mutex meal_lock for one of the philosophers\n"));
 	return (1);
 }
