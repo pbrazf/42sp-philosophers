@@ -1,11 +1,16 @@
-# Ignore files
-/obj
-/docs
+# Build artifacts
+obj/
 *.o
 *.a
-philo
-philo_bonus
+philo/philo
+philo_bonus/philo_bonus
 
 # Agent Config
 .agent/
 .gemini/
+
+# Subject
+subject.pdf
+
+# Analysis
+ANALYSIS.md
